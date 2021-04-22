@@ -3,7 +3,9 @@ package com.devesh.msit_notifier;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -65,7 +67,8 @@ public class NoticeFragment extends Fragment {
 
                      Elements links;
 
-                        for (int i = 0; i < li.size(); i++) {
+                        for (int i = 0; i < li.size(); i++)
+                        {
 
                             arrayList.add(li.get(i).select("li").text());
                             //Log.d("text",""+li.get(i).select("li").text());
@@ -126,6 +129,27 @@ public class NoticeFragment extends Fragment {
 
 
                                 }
+                            });
+
+                            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                                @Override
+                                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                    String url = "http://msit.in"+finalLinks.get(i).attr("href");
+
+                                    try {
+                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                        startActivity(browserIntent);
+
+//
+                                        return true;
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return  false;
+                                }
+
                             });
                         }
                         //Log.d("jsoup", "size: " + li.size());
