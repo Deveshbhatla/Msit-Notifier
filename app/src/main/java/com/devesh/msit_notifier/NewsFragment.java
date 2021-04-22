@@ -2,7 +2,9 @@ package com.devesh.msit_notifier;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -66,19 +69,32 @@ public class NewsFragment extends Fragment {
                         Document doc = Jsoup.connect("http://msit.in/latest_news").get();
 
                         Elements li = doc.select("div.tab-content").select("li");
-                        final Elements links = doc.select("div.tab-content").select("li").select("a");
+                        li.select("li").select("strong").remove();
+
+                        Elements links;
 
                         for (int i = 0; i < li.size(); i++) {
                            // Log.d("jsoup", " " + li.get(i).select("span > span").text());
+
                             arrayList.add(li.get(i).select("li").text());
                             //Log.d("text", "" + li.get(i).select("li").text());
+                            li.get(i).select("li").select("strong").remove();
+//                            Element image=doc.select("div.tab-content>li>img");
+                            Elements image=doc.select("div.tab-content").select("li").select("img");
+
+                            links = doc.select("div.tab-content").select("li").select("a");
+                            final Elements finalLinks = links;
+
                             listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                             {
                                 @RequiresApi(api = Build.VERSION_CODES.O)
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                                    String url="http://www.msit.in/latest_news";
+//                                    if(links.get(position).attr("strong").isEmpty())
+                                    String url = "http://msit.in"+finalLinks.get(position).attr("href");
 
-                                    String url = "http://msit.in"+links.get(position).attr("href");
+
                                     //Log.d("pdf", " " + url);
                                     View v = getLayoutInflater().inflate(R.layout.popup, null);
                                     web_View=v.findViewById(R.id.web_view);
@@ -98,8 +114,6 @@ public class NewsFragment extends Fragment {
                                         web_View.loadUrl("https://docs.google.com/viewer?embedded=true&url="+url);
                                         web_View.getSettings().setBuiltInZoomControls(true);
                                         web_View.getSettings().setDisplayZoomControls(false);
-
-
 
 
                                     }
@@ -127,6 +141,27 @@ public class NewsFragment extends Fragment {
 
 
                                 }
+                            });
+
+                            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                                @Override
+                                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                    String url = "http://msit.in"+finalLinks.get(i).attr("href");
+
+                                    try {
+                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                        startActivity(browserIntent);
+
+//
+                                        return true;
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return  false;
+                                    }
+
                             });
 
                         }
